@@ -2,8 +2,12 @@ package com.xiaopy;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioChannelOption;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 
 /**
  * @author xiaopeiyu
@@ -19,7 +23,12 @@ public class Server {
 
         ServerBootstrap serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
+                // 开启tcp keepalive
+                .childOption(ChannelOption.SO_KEEPALIVE,true)
+                .childOption(NioChannelOption.SO_KEEPALIVE,true)
                 .channel(NioServerSocketChannel.class)
+                // 开启日志
+                .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new MineServerInitializer());
         try {
             ChannelFuture channelFuture = serverBootstrap.bind(18088).sync();
